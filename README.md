@@ -11,7 +11,7 @@ This project provides a complete AWS infrastructure using Terraform as an Infras
 1. **EC2 Instances**
 
    - Creation of 2 independent EC2 instances
-   - Names: `nginx-server-dev` and `nginx-server-prod`
+   - Names: `nginx-server-dev` and `nginx_server_qa`
    - Operating system: Amazon Linux 2 / Ubuntu
    - Automatic Nginx installation as web server
 
