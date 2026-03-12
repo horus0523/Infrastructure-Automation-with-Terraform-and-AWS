@@ -6,7 +6,7 @@
 > 
 > **Solution:** Designed a modular Terraform architecture with reusable modules, remote state management in S3, and parameterized configurations that eliminate manual infrastructure provisioning entirely.
 > 
-> **Impact:
+> **Impact:**
 > - Eliminated manual server provisioning by implementing fully declarative IaC with reusable Terraform modules
 > - Enforced environment parity between dev and QA through parameterized, version-controlled configurations
 > - Secured infrastructure state by configuring S3 remote backend with encryption, preventing state corruption in team workflows
@@ -190,7 +190,7 @@ This project provides a complete AWS infrastructure using Terraform as an Infras
 
 3. **Requires an S3 Bucket created for later use in the backend**
    ```bash
-tf {
+   terraform {
    backend "s3" {
     bucket  = "infrastructure-automatization-with-terraform" # S3 bucket name
     key     = "infrastructure-automatization-with-terraform/terraform.tfstate" # file path and name
@@ -227,58 +227,58 @@ ssh-keygen -t ed25519 -C "qa@nginx-server" -f ssh-keys/nginx-server-qa.key -N ""
 
 ```bash
 # Initialize working directory
-tf init
+terraform init
 ```
 
 ### 4. Validate Configuration
 
 ```bash
 # Validate syntax
-tf validate
+terraform validate
 
 # Format code
-tf fmt
+terraform fmt
 ```
 
 ### 5. Plan Deployment
 
 ```bash
 # View execution plan
-tf plan
+terraform plan
 ```
 
 **Or use**
 
 ```bash
 # You can generate an execution plan and save it in a binary file called server_qa.tfplan
-tf plan -out=server_qa.tfplan
+terraform plan -out=server_qa.tfplan
 ```
 
 ### 6. Apply Changes
 
 ```bash
 # Apply configuration
-tf apply
+terraform apply
 
 # Apply automatically (without confirmation)
-tf apply -auto-approve
+terraform apply -auto-approve
 ```
 
 **Or use**
 
 ```bash
 # Applies the previously saved plan
-tf apply server_qa.tfplan
+terraform apply server_qa.tfplan
 ```
 
 ### 7. Verify Resources
 
 ```bash
 # View outputs
-tf output
+terraform output
 
 # View current state
-tf show
+terraform show
 ```
 
 ### 8. Connect to EC2 Instances
