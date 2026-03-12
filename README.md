@@ -261,24 +261,24 @@ terraform plan -out=server_qa.tfplan
 terraform apply
 
 # Apply automatically (without confirmation)
-terraform apply -auto-approve
+tf apply -auto-approve
 ```
 
 **Or use**
 
 ```bash
 # Applies the previously saved plan
-terraform apply server_qa.tfplan
+tf apply server_qa.tfplan
 ```
 
 ### 7. Verify Resources
 
 ```bash
 # View outputs
-terraform output
+tf output
 
 # View current state
-terraform show
+tf show
 ```
 
 ### 8. Connect to EC2 Instances
@@ -327,11 +327,13 @@ infrastructure-automation-with-terraform-and-aws/
 
 ```bash
 # List resources in state
-tfstate list
+tf state list
+
 # Show specific resource
-tfstate show aws_instance.example
+tf state show aws_instance.example
+
 # Import existing resource
-tfstate import aws_instance.example i-123450abcde0
+tf import aws_instance.example i-123450abcde0
 ```
 
 **To import the resource you must uncomment the code block in the `main.tf` file**
@@ -347,7 +349,7 @@ resource "aws_instance" "server-web" {
 **Execute the import command**
 
 ```bash
-tfstate import aws_instance.example i-123450abcde0
+tf import aws_instance.example i-123450abcde0
 ```
 
 ### Workspace Management
@@ -355,8 +357,10 @@ tfstate import aws_instance.example i-123450abcde0
 ```bash
 # Create workspace
 tf workspace new production
+
 # Switch workspace
 tf workspace select development
+
 # List workspaces
 tf workspace list
 ```
@@ -402,7 +406,7 @@ tf destroy -target=aws_instance.example
 
    ```bash
    # Force unlock (use with caution)
-   terraform force-unlock LOCK_ID
+tf force-unlock LOCK_ID
    ```
 
 3. **Permission Error**
