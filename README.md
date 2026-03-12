@@ -1,8 +1,61 @@
 # Terraform AWS Infrastructure Project
 
+## 💼 Why This Project Matters
+
+> **Problem:** Manual server provisioning across dev/QA environments introduced configuration drift, inconsistent security policies, and wasted engineering hours on repetitive tasks.
+> 
+> **Solution:** Designed a modular Terraform architecture with reusable modules, remote state management in S3, and parameterized configurations that eliminate manual infrastructure provisioning entirely.
+> 
+> **Impact:**
+> - Eliminated manual server provisioning by implementing fully declarative IaC with reusable Terraform modules
+> - Enforced environment parity between dev and QA through parameterized, version-controlled configurations
+> - Secured infrastructure state by configuring S3 remote backend with encryption, preventing state corruption in team workflows
+> - Reduced security attack surface by implementing Security Groups that restrict access to only required ports (SSH/HTTP), with documented guidance for IP-based restriction in production environments
+> - Automated web server bootstrapping via EC2 user_data scripts, ensuring Nginx is installed, enabled, and running at instance launch without manual intervention
+> - Protected sensitive outputs (private IPs, instance IDs) using Terraform's `sensitive` flag to prevent accidental exposure in logs
+
+## 🏷️ Keywords & Technologies
+
+`Terraform` · `AWS EC2` · `AWS S3` · `Infrastructure as Code (IaC)` · `Remote State Management` · `Terraform Modules` · `Security Groups` · `SSH Key Management` · `IAM` · `Nginx` · `Multi-Environment Deployment` · `HCL` · `AWS CLI` · `DevOps` · `Cloud Infrastructure` · `user_data Bootstrapping` · `ED25519 SSH Keys`
+
+---
+
 ## 🎯 Purpose
 
 This project provides a complete AWS infrastructure using Terraform as an Infrastructure as Code (IaC) tool. The solution provides a scalable and reproducible environment for hosting client web applications.
+
+## 🏗️ Architecture Diagram
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Terraform CLI                         │
+│              (terraform init/plan/apply)                 │
+└────────────────────┬────────────────────────────────────┘
+                     │
+          ┌──────────┴──────────┐
+          ▼                     ▼
+┌──────────────────┐  ┌──────────────────┐
+│   nginx_server   │  │   nginx_server   │
+│     module       │  │     module       │
+│   (dev env)      │  │   (qa env)       │
+├──────────────────┤  ├────��─────────────┤
+│ • EC2 Instance   │  │ • EC2 Instance   │
+│ • user_data:     │  │ • user_data:     │
+│   Nginx auto-    │  │   Nginx auto-    │
+│   install+start  │  │   install+start  │
+│ • Security Group │  │ • Security Group │
+│ • SSH Key Pair   │  │ • SSH Key Pair   │
+│   (ED25519)      │  │   (ED25519)      │
+└──────────────────┘  └──────────────────┘
+          │                     │
+          └──────────┬──────────┘
+                     ▼
+          ┌──────────────────┐
+          │   S3 Backend     │
+          │ (Remote State)   │
+          │  + Encryption    │
+          └──────────────────┘
+```
 
 ## 🏗️ Project Architecture
 
@@ -144,6 +197,7 @@ This project provides a complete AWS infrastructure using Terraform as an Infras
     region  = "us-east-1"
     #encrypt = true # Enable SSE-S3 encryption
    }
+   }
    ```
 
 ## 🚀 Installation and Usage
@@ -197,34 +251,34 @@ terraform plan
 
 ```bash
 # You can generate an execution plan and save it in a binary file called server_qa.tfplan
-terraform plan -out=server_qa.tfplan
+tf plan -out=server_qa.tfplan
 ```
 
 ### 6. Apply Changes
 
 ```bash
 # Apply configuration
-terraform apply
+tf apply
 
 # Apply automatically (without confirmation)
-terraform apply -auto-approve
+tf apply -auto-approve
 ```
 
 **Or use**
 
 ```bash
 # Applies the previously saved plan
-terraform apply server_qa.tfplan
+tf apply server_qa.tfplan
 ```
 
 ### 7. Verify Resources
 
 ```bash
 # View outputs
-terraform output
+tf output
 
 # View current state
-terraform show
+tf show
 ```
 
 ### 8. Connect to EC2 Instances
@@ -273,13 +327,13 @@ infrastructure-automation-with-terraform-and-aws/
 
 ```bash
 # List resources in state
-terraform state list
+tf state list
 
 # Show specific resource
-terraform state show aws_instance.example
+tf state show aws_instance.example
 
 # Import existing resource
-terraform import aws_instance.example i-123450abcde0
+tf import aws_instance.example i-123450abcde0
 ```
 
 **To import the resource you must uncomment the code block in the `main.tf` file**
@@ -295,34 +349,34 @@ resource "aws_instance" "server-web" {
 **Execute the import command**
 
 ```bash
-terraform import aws_instance.example i-123450abcde0
+tf import aws_instance.example i-123450abcde0
 ```
 
 ### Workspace Management
 
 ```bash
 # Create workspace
-terraform workspace new production
+tf workspace new production
 
 # Switch workspace
-terraform workspace select development
+tf workspace select development
 
 # List workspaces
-terraform workspace list
+tf workspace list
 ```
 
 ### Destroy Infrastructure
 
 ```bash
 # Destroy all resources
-terraform destroy
+tf destroy
 ```
 
 **Or use**
 
 ```bash
 # Destroy specific resource
-terraform destroy -target=aws_instance.example
+tf destroy -target=aws_instance.example
 ```
 
 ## 🔒 Security
@@ -335,6 +389,7 @@ terraform destroy -target=aws_instance.example
 - ✅ Security groups with minimal rules
 - ✅ IAM roles with limited permissions
 - ✅ Tags for traceability
+- ✅ Sensitive outputs protected from log exposure
 
 ## 🐛 Troubleshooting
 
@@ -351,7 +406,7 @@ terraform destroy -target=aws_instance.example
 
    ```bash
    # Force unlock (use with caution)
-   terraform force-unlock LOCK_ID
+   tf force-unlock LOCK_ID
    ```
 
 3. **Permission Error**
@@ -366,3 +421,10 @@ terraform destroy -target=aws_instance.example
 - [Official Terraform Documentation](https://www.terraform.io/docs)
 - [AWS Provider Guide](https://registry.terraform.io/providers/hashicorp/aws/latest/docs)
 - [Terraform Best Practices](https://www.terraform.io/docs/cloud/guides/recommended-practices/index.html)
+
+## 👤 Author
+
+**Horus Chourio** — Cloud DevOps Engineer | AWS Certified Cloud Practitioner | CKA Candidate
+
+- Specializing in Infrastructure as Code, CI/CD pipeline design, and cloud automation on AWS
+- [LinkedIn](https://linkedin.com/in/horus-chourio) · [GitHub](https://github.com/horus0523)
