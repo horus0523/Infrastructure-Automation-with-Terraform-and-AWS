@@ -30,7 +30,7 @@ This project provides a complete AWS infrastructure using Terraform as an Infras
 ┌─────────────────────────────────────────────────────────┐
 │                    Terraform CLI                         │
 │              (terraform init/plan/apply)                 │
-└───��────────────────┬────────────────────────────────────┘
+└────────────────────┬────────────────────────────────────┘
                      │
           ┌──────────┴──────────┐
           ▼                     ▼
@@ -327,13 +327,11 @@ infrastructure-automation-with-terraform-and-aws/
 
 ```bash
 # List resources in state
-tf state list
-
+tfstate list
 # Show specific resource
-tf state show aws_instance.example
-
+tfstate show aws_instance.example
 # Import existing resource
-tf import aws_instance.example i-123450abcde0
+tfstate import aws_instance.example i-123450abcde0
 ```
 
 **To import the resource you must uncomment the code block in the `main.tf` file**
@@ -349,7 +347,7 @@ resource "aws_instance" "server-web" {
 **Execute the import command**
 
 ```bash
-tf import aws_instance.example i-123450abcde0
+tfstate import aws_instance.example i-123450abcde0
 ```
 
 ### Workspace Management
@@ -357,10 +355,8 @@ tf import aws_instance.example i-123450abcde0
 ```bash
 # Create workspace
 tf workspace new production
-
 # Switch workspace
 tf workspace select development
-
 # List workspaces
 tf workspace list
 ```
