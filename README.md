@@ -144,7 +144,7 @@ This project provides a complete AWS infrastructure using Terraform as an Infras
    ```bash
    # Verify installation
    terraform version
-   ```
+   ````
 
 2. **AWS CLI** configured
 
@@ -261,24 +261,24 @@ terraform plan -out=server_qa.tfplan
 terraform apply
 
 # Apply automatically (without confirmation)
-tf apply -auto-approve
+terraform apply -auto-approve
 ```
 
 **Or use**
 
 ```bash
 # Applies the previously saved plan
-tf apply server_qa.tfplan
+terraform apply server_qa.tfplan
 ```
 
 ### 7. Verify Resources
 
 ```bash
 # View outputs
-tf output
+terraform output
 
 # View current state
-tf show
+terraform show
 ```
 
 ### 8. Connect to EC2 Instances
@@ -301,12 +301,12 @@ ssh -i ./ssh-keys/nginx-server-qa.key ec2-user@publicIP # Replace `publicIP` wit
 infrastructure-automation-with-terraform-and-aws/
 ├── main.tf                   # Main configuration
 ├── nginx_server_module/      # Reusable modules
-│   ├── 00.variables.tf/      # Variable definitions
-│   ├── 01.provider.tf/       # Provider definition
-│   └── 02.ec2.tf/            # EC2 instance definition
-│   └── 03.key.tf/            # Key definition
-│   └── 04.sg.tf/             # Security groups definition
-│   └── 05.outputs.tf/        # Output definitions
+│   ├── 00.variables.tf       # Variable definitions
+│   ├── 01.provider.tf        # Provider definition
+│   ├── 02.ec2.tf             # EC2 instance definition
+│   ├── 03.key.tf             # Key definition
+│   ├── 04.sg.tf              # Security groups definition
+│   └── 05.outputs.tf         # Output definitions
 └── README.md                 # README file
 ```
 
@@ -327,56 +327,56 @@ infrastructure-automation-with-terraform-and-aws/
 
 ```bash
 # List resources in state
-tf state list
+tfstate list
 
 # Show specific resource
-tf state show aws_instance.example
+tfstate show aws_instance.example
 
 # Import existing resource
-tf import aws_instance.example i-123450abcde0
+tfstate import aws_instance.example i-123450abcde0
 ```
 
 **To import the resource you must uncomment the code block in the `main.tf` file**
 
-```bash
+```hcl
 ####### import #######
 # Import resources to terraform `ec2 instance`
 resource "aws_instance" "server-web" {
-(resource arguments)
+  # (resource arguments)
 }
 ```
 
 **Execute the import command**
 
 ```bash
-tf import aws_instance.example i-123450abcde0
+terraform import aws_instance.example i-123450abcde0
 ```
 
 ### Workspace Management
 
 ```bash
 # Create workspace
-tf workspace new production
+terraform workspace new production
 
 # Switch workspace
-tf workspace select development
+tfworkspace select development
 
 # List workspaces
-tf workspace list
+terraform workspace list
 ```
 
 ### Destroy Infrastructure
 
 ```bash
 # Destroy all resources
-tf destroy
+tfstate destroy
 ```
 
 **Or use**
 
 ```bash
 # Destroy specific resource
-tf destroy -target=aws_instance.example
+tfstate destroy -target=aws_instance.example
 ```
 
 ## 🔒 Security
@@ -406,7 +406,7 @@ tf destroy -target=aws_instance.example
 
    ```bash
    # Force unlock (use with caution)
-tf force-unlock LOCK_ID
+   terraform force-unlock LOCK_ID
    ```
 
 3. **Permission Error**
