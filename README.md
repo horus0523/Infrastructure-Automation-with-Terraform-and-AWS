@@ -6,7 +6,7 @@
 > 
 > **Solution:** Designed a modular Terraform architecture with reusable modules, remote state management in S3, and parameterized configurations that eliminate manual infrastructure provisioning entirely.
 > 
-> **Impact:**
+> **Impact:
 > - Eliminated manual server provisioning by implementing fully declarative IaC with reusable Terraform modules
 > - Enforced environment parity between dev and QA through parameterized, version-controlled configurations
 > - Secured infrastructure state by configuring S3 remote backend with encryption, preventing state corruption in team workflows
@@ -38,7 +38,7 @@ This project provides a complete AWS infrastructure using Terraform as an Infras
 │   nginx_server   │  │   nginx_server   │
 │     module       │  │     module       │
 │   (dev env)      │  │   (qa env)       │
-├──────────────────┤  ├────��─────────────┤
+├──────────────────┤  ├──────────────────┤
 │ • EC2 Instance   │  │ • EC2 Instance   │
 │ • user_data:     │  │ • user_data:     │
 │   Nginx auto-    │  │   Nginx auto-    │
@@ -150,7 +150,7 @@ This project provides a complete AWS infrastructure using Terraform as an Infras
 
    ```bash
    # Install AWS CLI
-   curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+   curl "https://awscli.amazonaws.com/awscliv2.zip" -o "awscliv2.zip"
    unzip awscliv2.zip
    sudo ./aws/install
 
@@ -190,7 +190,7 @@ This project provides a complete AWS infrastructure using Terraform as an Infras
 
 3. **Requires an S3 Bucket created for later use in the backend**
    ```bash
-   terraform {
+tf {
    backend "s3" {
     bucket  = "infrastructure-automatization-with-terraform" # S3 bucket name
     key     = "infrastructure-automatization-with-terraform/terraform.tfstate" # file path and name
@@ -227,24 +227,24 @@ ssh-keygen -t ed25519 -C "qa@nginx-server" -f ssh-keys/nginx-server-qa.key -N ""
 
 ```bash
 # Initialize working directory
-terraform init
+tf init
 ```
 
 ### 4. Validate Configuration
 
 ```bash
 # Validate syntax
-terraform validate
+tf validate
 
 # Format code
-terraform fmt
+tf fmt
 ```
 
 ### 5. Plan Deployment
 
 ```bash
 # View execution plan
-terraform plan
+tf plan
 ```
 
 **Or use**
