@@ -146,7 +146,7 @@ cd Infrastructure-Automation-with-Terraform-and-AWS
 Before planning or applying, provide the input values required by the current
 root module using your normal Terraform workflow. For example, use CLI
 variables, environment variables, or a local `.tfvars` file that you create and
-manage outside the tracked PR1A docs-only slice.
+manage outside the repository.
 
 ### 3. Initialize Terraform
 
@@ -236,12 +236,13 @@ infrastructure-automation-with-terraform-and-aws/
 
 ### Main Variables
 
-| Variable        | Description            | Default Value           |
-| --------------- | ---------------------- | ----------------------- |
-| `environment`   | Deployment environment | `test`                  |
-| `instance_type` | EC2 instance type      | `t3.micro`              |
-| `server_name`   | Server name            | `nginx-server`          |
-| `ami_id`        | AMI ID                 | `ami-0440d3b780d96b29d` |
+| Variable | Description | Default Value |
+| -------- | ----------- | ------------- |
+| `aws_region` | AWS region for the root module | `us-east-1` |
+| `allowed_ssh_cidr` | Trusted IPv4 CIDR allowed to reach SSH on both instances | `127.0.0.1/32` |
+| `nginx_dev_public_key` | SSH public key contents for the dev key pair | Required |
+| `nginx_qa_public_key` | SSH public key contents for the qa key pair | Required |
+| `common_tags` | Optional extra tags merged into all resources | `{}` |
 
 ## Useful Commands
 

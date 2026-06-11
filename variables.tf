@@ -5,13 +5,13 @@ variable "aws_region" {
 }
 
 variable "allowed_ssh_cidr" {
-  description = "Single trusted CIDR block allowed to access port 22 on both EC2 instances"
+  description = "Single trusted IPv4 CIDR block allowed to access port 22 on both EC2 instances"
   type        = string
   default     = "127.0.0.1/32"
 
   validation {
-    condition     = can(cidrhost(var.allowed_ssh_cidr, 0))
-    error_message = "allowed_ssh_cidr must be a valid IPv4 or IPv6 CIDR block such as 203.0.113.10/32."
+    condition = can(regex("^[0-9]{1,3}(\\.[0-9]{1,3}){3}/[0-9]{1,2}$", var.allowed_ssh_cidr)) && can(cidrhost(var.allowed_ssh_cidr, 0))
+    error_message = "allowed_ssh_cidr must be a valid IPv4 CIDR block such as 203.0.113.10/32."
   }
 }
 
