@@ -12,13 +12,13 @@ output "server_public_dns" {
 output "server_private_ip" {
   description = "Private IP address of the EC2 instance"
   value       = aws_instance.nginx-server.private_ip
-  sensitive   = true # Marca como sensible para evitar mostrar en logs
+  sensitive   = true
 }
 
 output "server_instance_id" {
   description = "ID of the EC2 instance"
   value       = aws_instance.nginx-server.id
-  sensitive   = true # Marca como sensible para evitar mostrar en logs
+  sensitive   = true
 }
 
 output "server_security_group_id" {

@@ -16,15 +16,9 @@ resource "aws_instance" "nginx-server" {
     aws_security_group.nginx-server-sg.id
   ]
 
-  tags = {
+  tags = merge(var.common_tags, {
     Name        = var.server_name
     Environment = var.environment
-    Owner       = "horus0523@gmail.com"
-    Team        = "DevOps"
     Project     = "Infrastructure-Automation-with-Terraform-and-AWS"
-  }
+  })
 }
-
-# connect to ec2 instance with:
-#ssh -i ./ssh-keys/nginx-server-dev.key ec2-user@publicIP # Replace `publicIP` with your actual public IP. This is shown in the output
-#ssh -i ./ssh-keys/nginx-server-qa.key ec2-user@publicIP # Replace `publicIP` with your actual public IP. This is shown in the output

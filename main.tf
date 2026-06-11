@@ -2,11 +2,12 @@
 # Configures the Terraform "backend" to store the state file (`tfstate`) in a specific S3 bucket
 # For this to work, the S3 bucket must be created
 terraform {
+  required_version = ">= 1.5.0"
+
   backend "s3" {
     bucket = "infrastructure-automatization-with-terraform"
     key    = "infrastructure-automatization/terraform.tfstate"
     region = "us-east-1"
-    #encrypt = true # Enables SSE-S3 encryption
   }
 }
 
@@ -14,19 +15,27 @@ terraform {
 module "nginx_server_dev" {
   source = "./nginx_server_module"
 
-  ami_id        = "ami-0440d3b780d96b29d"
-  instance_type = "t3.medium"
-  server_name   = "nginx-server-dev"
-  environment   = "dev"
+  aws_region       = var.aws_region
+  ami_id           = "ami-0440d3b780d96b29d"
+  instance_type    = "t3.medium"
+  server_name      = "nginx-server-dev"
+  environment      = "dev"
+  allowed_ssh_cidr = var.allowed_ssh_cidr
+  public_key       = var.nginx_dev_public_key
+  common_tags      = var.common_tags
 }
 
 module "nginx_server_qa" {
   source = "./nginx_server_module"
 
-  ami_id        = "ami-0440d3b780d96b29d"
-  instance_type = "t3.medium"
-  server_name   = "nginx-server-qa"
-  environment   = "qa"
+  aws_region       = var.aws_region
+  ami_id           = "ami-0440d3b780d96b29d"
+  instance_type    = "t3.medium"
+  server_name      = "nginx-server-qa"
+  environment      = "qa"
+  allowed_ssh_cidr = var.allowed_ssh_cidr
+  public_key       = var.nginx_qa_public_key
+  common_tags      = var.common_tags
 }
 
 # By default, Terraform modules save the outputs, they are not displayed
