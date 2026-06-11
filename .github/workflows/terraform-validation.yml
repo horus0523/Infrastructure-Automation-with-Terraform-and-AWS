@@ -1,0 +1,81 @@
+name: Terraform Validation
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+
+permissions:
+  contents: read
+
+env:
+  TF_IN_AUTOMATION: "true"
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: "us-east-1"
+  TF_VAR_allowed_ssh_cidr: "203.0.113.10/32"
+  TF_VAR_nginx_dev_public_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBExampleReplaceThisWithYourDevPublicKey dev@example-lab"
+  TF_VAR_nginx_qa_public_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBExampleReplaceThisWithYourQaPublicKey qa@example-lab"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd
+        with:
+          terraform_version: 1.8.5
+
+      - name: Setup Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.12"
+
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@90f302c255ef959cbfb4bd10581afecdb7ece3e6
+
+      - name: Check Terraform formatting
+        run: terraform fmt -check -recursive
+
+      - name: Initialize Terraform without backend
+        run: terraform init -backend=false
+
+      - name: Validate Terraform configuration
+        run: terraform validate
+
+      - name: Initialize TFLint plugins
+        run: tflint --init
+
+      - name: Run TFLint
+        run: tflint --recursive
+
+      - name: Install Checkov
+        run: python -m pip install --upgrade pip checkov
+
+      - name: Run Checkov
+        run: checkov -d . --compact
+
+      - name: Terraform Plan for PR
+        if: github.event_name == 'pull_request' && env.AWS_ACCESS_KEY_ID != '' && env.AWS_SECRET_ACCESS_KEY != ''
+        run: terraform plan -no-color -out=tfplan
+        id: plan
+
+      - name: Upload Terraform Plan
+        if: github.event_name == 'pull_request' && steps.plan.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: terraform-plan-output
+          path: tfplan
+          retention-days: 5
+
+      - name: Display Terraform Plan Output
+        if: github.event_name == 'pull_request' && steps.plan.outcome == 'success'
+        run: |
+          echo "## Terraform Plan Summary" >> $GITHUB_STEP_SUMMARY
+          terraform show -no-color tfplan >> $GITHUB_STEP_SUMMARY
