@@ -7,8 +7,9 @@
 *.tfstate
 *.tfstate.*
 
-# lock hcl
+# Terraform provider lock file should be committed for reproducible provider resolution.
 *.lock.hcl*
+!.terraform.lock.hcl
 
 # Crash log files
 crash.log
