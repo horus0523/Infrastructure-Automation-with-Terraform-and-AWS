@@ -10,7 +10,9 @@ This file shows a representative `terraform plan` sample for the current root mo
 ```bash
 terraform init
 terraform workspace new dev
-terraform plan -var-file=dev.tfvars -out=tfplan
+cp terraform.tfvars.example local.tfvars
+# Edit local.tfvars with real values before planning.
+terraform plan -var-file=local.tfvars -out=tfplan
 terraform show -no-color tfplan
 ```
 

@@ -144,9 +144,12 @@ cd Infrastructure-Automation-with-Terraform-and-AWS
 ### 2. Prepare input values
 
 Before planning or applying, provide the input values required by the current
-root module using your normal Terraform workflow. For example, use CLI
-variables, environment variables, or a local `.tfvars` file that you create and
-manage outside the repository.
+root module using your normal Terraform workflow. The repository includes
+`terraform.tfvars.example` as a template with safe placeholder values.
+
+Copy that file to a local ignored file such as `local.tfvars` or
+`<your-local-file>.tfvars`, replace the placeholders with your real values, and
+keep that local file outside version control.
 
 ### 3. Initialize Terraform
 
@@ -170,8 +173,11 @@ terraform plan
 If you use `-var-file`, remember that it only changes input values for the same root module. It does not select a single environment module.
 
 ```bash
-terraform plan -var-file=dev.tfvars
-terraform plan -var-file=qa.tfvars
+cp terraform.tfvars.example local.tfvars
+terraform plan -var-file=local.tfvars
+
+# or use your own ignored filename
+terraform plan -var-file=<your-local-file>.tfvars
 ```
 
 On an empty state, the current root module still plans both `nginx_server_dev` and `nginx_server_qa`, so the expected summary is **6 resources to add**.
@@ -183,8 +189,10 @@ terraform apply
 ```
 
 ```bash
-terraform apply -var-file=dev.tfvars
-terraform apply -var-file=qa.tfvars
+terraform apply -var-file=local.tfvars
+
+# or use your own ignored filename
+terraform apply -var-file=<your-local-file>.tfvars
 ```
 
 ### 7. Verify Resources
