@@ -120,5 +120,5 @@ checkov -d .
 ## Notes
 
 - Re-running a plan with the same configuration and state should produce the same summary when no external changes occurred.
-- The configured S3 backend in `main.tf` currently sets `bucket`, `key`, and `region`.
+- The configured S3 backend in `main.tf` currently sets `bucket`, `key`, `region`, `encrypt`, and `use_lockfile`.
 - The output shown here is representative; real values vary with AWS account state.
