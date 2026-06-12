@@ -167,26 +167,20 @@ terraform fmt
 ### 5. Plan Deployment
 
 ```bash
-terraform plan
+cp terraform.tfvars.example local.tfvars
+# Edit local.tfvars with real values before planning.
+terraform plan -var-file=local.tfvars
 ```
 
-If you use `-var-file`, remember that it only changes input values for the same root module. It does not select a single environment module.
+Terraform automatically loads `terraform.tfvars` and `*.auto.tfvars` files from the working directory. Other `.tfvars` files require `-var-file`. Remember that `-var-file` only changes input values for the same root module. It does not select a single environment module.
 
 ```bash
-cp terraform.tfvars.example local.tfvars
-terraform plan -var-file=local.tfvars
-
-# or use your own ignored filename
 terraform plan -var-file=<your-local-file>.tfvars
 ```
 
 On an empty state, the current root module still plans both `nginx_server_dev` and `nginx_server_qa`, so the expected summary is **6 resources to add**.
 
 ### 6. Apply Changes
-
-```bash
-terraform apply
-```
 
 ```bash
 terraform apply -var-file=local.tfvars
