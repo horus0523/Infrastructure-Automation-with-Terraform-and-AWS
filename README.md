@@ -122,15 +122,17 @@ This project provisions a simple AWS lab environment with Terraform. The current
 
 3. **Pre-existing S3 Backend Bucket**
 
-   ```hcl
-   terraform {
-     backend "s3" {
-       bucket = "infrastructure-automatization-with-terraform"
-       key    = "infrastructure-automatization/terraform.tfstate"
-       region = "us-east-1"
-     }
-   }
-   ```
+    ```hcl
+    terraform {
+      backend "s3" {
+        bucket       = "infrastructure-automatization-with-terraform"
+        key          = "infrastructure-automatization/terraform.tfstate"
+        region       = "us-east-1"
+        encrypt      = true
+        use_lockfile = true
+      }
+    }
+    ```
 
 ## Installation and Usage
 

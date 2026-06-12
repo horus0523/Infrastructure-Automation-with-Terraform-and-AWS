@@ -17,11 +17,13 @@ terraform {
     bucket         = "infrastructure-automatization-with-terraform"
     key            = "infrastructure-automatization/terraform.tfstate"
     region         = "us-east-1"
+    encrypt        = true
+    use_lockfile   = true
   }
 }
 ```
 
-This repository does not currently configure `encrypt`, `dynamodb_table`, or S3 native lockfile settings in the backend block. Those controls may still be enforced by the AWS bucket configuration, but they are outside the Terraform code tracked here.
+This repository configures S3 backend encryption with `encrypt = true` and Terraform S3 native state locking with `use_lockfile = true`. No DynamoDB locking table is declared because the tracked backend uses native lockfile locking instead.
 
 ### Workspace Strategy
 
@@ -35,11 +37,13 @@ This repository does not currently configure `encrypt`, `dynamodb_table`, or S3 
 - If non-default Terraform workspaces are used, Terraform stores workspace-specific state objects using the backend's workspace-aware S3 layout rather than the default workspace object.
 - This ADR does not hardcode literal object paths such as `env:/dev/` or `env:/qa/` because the exact object name is resolved by the backend implementation.
 - No DynamoDB locking table is declared in the tracked backend configuration.
+- The tracked backend enables S3 server-side encryption and native lockfile-based state locking.
 
 ## Consequences
 
 - State is stored remotely in the configured S3 bucket
-- State encryption and locking guarantees depend on external AWS bucket controls unless they are added to the backend block later
+- State encryption is requested through the backend with `encrypt = true`
+- State locking uses Terraform S3 native lockfile support via `use_lockfile = true`
 - The current root module manages both environment module instances together in one configuration
 - Workspace usage changes which state snapshot Terraform reads and writes for a run, not which environment modules exist in this root module
 - The S3 bucket must exist before backend initialization
