@@ -38,7 +38,7 @@ This project provisions a simple AWS lab environment with Terraform. The current
 5. **S3 Backend**
 
    - Uses a pre-existing S3 bucket for Terraform state
-   - The tracked backend block sets `bucket`, `key`, and `region`
+   - The tracked backend block sets `bucket`, `key`, `region`, `encrypt`, and `use_lockfile`
 
 ## Specific Objectives
 
