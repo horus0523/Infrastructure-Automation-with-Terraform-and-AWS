@@ -269,7 +269,7 @@ terraform workspace list
 ### Destroy Infrastructure
 
 ```bash
-terraform destroy
+terraform destroy -var-file="local.tfvars"
 ```
 
 ## Security
