@@ -10,7 +10,9 @@ variable "allowed_ssh_cidr" {
   default     = "127.0.0.1/32"
 
   validation {
-    condition = can(regex("^[0-9]{1,3}(\\.[0-9]{1,3}){3}/[0-9]{1,2}$", var.allowed_ssh_cidr)) && can(cidrhost(var.allowed_ssh_cidr, 0))
+    condition = can(
+      regex("^[0-9]{1,3}(\\.[0-9]{1,3}){3}/[0-9]{1,2}$", var.allowed_ssh_cidr)
+    ) && can(cidrhost(var.allowed_ssh_cidr, 0))
     error_message = "allowed_ssh_cidr must be a valid IPv4 CIDR block such as 203.0.113.10/32."
   }
 }
