@@ -108,11 +108,11 @@ This project provisions a simple AWS lab environment with Terraform. The current
    aws configure
    ```
 
-   Or set environment variables:
+   Or use a named profile:
 
    ```bash
-   export AWS_ACCESS_KEY_ID="your-access-key"
-   export AWS_SECRET_ACCESS_KEY="your-secret-key"
+   aws configure --profile terraform-lab
+   export AWS_PROFILE="terraform-lab"
    export AWS_DEFAULT_REGION="us-east-1"
    ```
 
