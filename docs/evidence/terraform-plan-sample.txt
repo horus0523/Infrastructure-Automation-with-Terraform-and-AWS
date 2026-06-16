@@ -1,0 +1,124 @@
+# Terraform Plan Sample Output
+
+## Context
+
+This file shows a representative `terraform plan` sample for the current root module.
+`main.tf` always instantiates both `module.nginx_server_dev` and `module.nginx_server_qa`; the selected `-var-file` only supplies input values.
+
+## Execution
+
+```bash
+terraform init
+terraform workspace new dev
+cp terraform.tfvars.example local.tfvars
+# Edit local.tfvars with real values before planning.
+terraform plan -var-file=local.tfvars -out=tfplan
+terraform show -no-color tfplan
+```
+
+The command above still plans both modules because both are declared in `main.tf`.
+
+## Expected Output (empty state)
+
+```
+Terraform used the selected providers to generate the following execution plan.
+Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # module.nginx_server_dev.aws_instance.nginx-server will be created
+  + resource "aws_instance" "nginx-server" {
+      ami                           = "ami-0abcdef1234567890"
+      instance_type                 = "t3.medium"
+      key_name                      = (known after apply)
+      vpc_security_group_ids        = (known after apply)
+      user_data                     = (sensitive value)
+      ...
+    }
+
+  # module.nginx_server_dev.aws_key_pair.nginx-server-ssh will be created
+  + resource "aws_key_pair" "nginx-server-ssh" {
+      fingerprint      = (known after apply)
+      key_name         = "nginx-server-dev-ssh"
+      public_key       = (known after apply)
+    }
+
+  # module.nginx_server_dev.aws_security_group.nginx-server-sg will be created
+  + resource "aws_security_group" "nginx-server-sg" {
+      description      = "Security group allowing SSH and HTTP access"
+      ingress          = [
+        {
+          cidr_blocks = ["203.0.113.10/32"]  # var.allowed_ssh_cidr
+          from_port   = 22
+          protocol    = "tcp"
+          to_port     = 22
+        },
+        {
+          cidr_blocks = ["0.0.0.0/0"]
+          from_port   = 80
+          protocol    = "tcp"
+          to_port     = 80
+        },
+      ]
+      name             = "nginx-server-dev-sg"
+      ...
+    }
+
+  # module.nginx_server_qa.aws_instance.nginx-server will be created
+  + resource "aws_instance" "nginx-server" {
+      ami                           = "ami-0abcdef1234567890"
+      instance_type                 = "t3.medium"
+      key_name                      = (known after apply)
+      vpc_security_group_ids        = (known after apply)
+      user_data                     = (sensitive value)
+      ...
+    }
+
+  # module.nginx_server_qa.aws_key_pair.nginx-server-ssh will be created
+  + resource "aws_key_pair" "nginx-server-ssh" {
+      fingerprint      = (known after apply)
+      key_name         = "nginx-server-qa-ssh"
+      public_key       = (known after apply)
+    }
+
+  # module.nginx_server_qa.aws_security_group.nginx-server-sg will be created
+  + resource "aws_security_group" "nginx-server-sg" {
+      description      = "Security group allowing SSH and HTTP access"
+      name             = "nginx-server-qa-sg"
+      ...
+    }
+
+Plan: 6 to add, 0 to change, 0 to destroy.
+```
+
+## Plan Metrics
+
+| Metric | Value |
+|---------|-------|
+| Resources to create | 6 |
+| Resources to modify | 0 |
+| Resources to destroy | 0 |
+| Modules in scope | 2 (`nginx_server_dev`, `nginx_server_qa`) |
+
+## Plan Evidence Scope
+
+This file is checked-in sample evidence for review of the current Terraform structure.
+
+It is representative rather than account-specific: placeholder AMI values, generated names, and final computed attributes vary by AWS account, region, and state.
+
+## Checks Before Plan
+
+```bash
+terraform fmt -check -recursive
+terraform init -backend=false
+terraform validate
+tflint --recursive
+checkov -d .
+```
+
+## Notes
+
+- Re-running a plan with the same configuration and state should produce the same summary when no external changes occurred.
+- The configured S3 backend in `main.tf` currently sets `bucket`, `key`, `region`, `encrypt`, and `use_lockfile`.
+- The output shown here is representative; real values vary with AWS account state.

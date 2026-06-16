@@ -1,0 +1,10 @@
+# Safe documentation value only (TEST-NET-3). Replace with your real public /32.
+allowed_ssh_cidr = "203.0.113.10/32"
+
+nginx_dev_public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBExampleReplaceThisWithYourDevPublicKey dev@nginx-server"
+nginx_qa_public_key  = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBExampleReplaceThisWithYourQaPublicKey qa@nginx-server"
+
+common_tags = {
+  Owner = "platform"
+  Team  = "DevOps"
+}

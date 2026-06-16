@@ -1,32 +1,31 @@
 # Terraform AWS Infrastructure Project
 
-## 🎯 Purpose
+## Purpose
 
-This project provides a complete AWS infrastructure using Terraform as an Infrastructure as Code (IaC) tool. The solution provides a scalable and reproducible environment for hosting client web applications.
+This project provisions a simple AWS lab environment with Terraform. The current root module creates two EC2 instances with Nginx plus the related key pairs, security groups, and outputs.
 
-## 🏗️ Project Architecture
+## Project Architecture
 
 ### Main Components
 
 1. **EC2 Instances**
 
    - Creation of 2 independent EC2 instances
-   - Names: `nginx-server-dev` and `nginx_server_qa`
-   - Operating system: Amazon Linux 2023 / Ubuntu
+   - Names: `nginx-server-dev` and `nginx-server-qa`
+   - AMI selected through the `ami_id` variable in the module call
    - Automatic Nginx installation as web server
 
 2. **SSH Access Management**
 
-   - SSH key pair generation/configuration
-   - Secure access implementation for remote administration
-   - Appropriate user permissions configuration
+   - SSH key pair configuration is part of the Terraform root/module setup
+   - Separate key pair resource per module instance
 
 3. **Security Configuration**
 
-   - **Security Groups** configured with specific rules:
-     - **Port 80 (HTTP)**: Public access for web traffic
-     - **Port 22 (SSH)**: Restricted access for administration
-   - Least privilege principle implementation
+    - **Security Groups** configured with specific rules:
+      - **Port 80 (HTTP)**: Public access for web traffic
+      - **Port 22 (SSH)**: Restricted according to the input values used at plan/apply time
+   - Outbound traffic is currently open to all destinations
 
 4. **Tagging and Organization**
 
@@ -36,76 +35,67 @@ This project provides a complete AWS infrastructure using Terraform as an Infras
      - Environment organization
      - Operational traceability
 
-5. **S3 Bucket**
+5. **S3 Backend**
 
-   - Manually create and configure the S3 bucket
-   - Configures the Terraform "backend" to store the state file (`tfstate`) in a specific S3 bucket
+   - Uses a pre-existing S3 bucket for Terraform state
+   - The tracked backend block sets `bucket`, `key`, `region`, `encrypt`, and `use_lockfile`
 
-## 🎯 Specific Objectives
+## Specific Objectives
 
 ### Technical
 
-- ✅ Automate web infrastructure deployment
-- ✅ Implement security best practices
-- ✅ Create a scalable foundation for multiple clients
-- ✅ Establish reproducible configuration across environments
+- Automate web infrastructure deployment
+- Establish reproducible configuration across environments
+- Keep the example small enough to inspect and learn from
 
 ### Operational
 
-- ✅ Reduce server provisioning time
-- ✅ Minimize manual configuration errors
-- ✅ Facilitate infrastructure management and maintenance
-- ✅ Provide clear process documentation
+- Reduce server provisioning time
+- Minimize manual configuration errors
+- Provide clear process documentation
 
-## 🏢 Use Case
+## Use Case
 
 **Scenario**: Web server deployment for hosting client websites in dev and QA environments.
 
 **Benefits**:
 
-- Deployment time reduced from hours to minutes
+- Standardized Terraform workflow for repeatable provisioning
 - Consistent configuration across environments
-- Easy replication for new clients
+- Easy replication for experiments
 - Centralized infrastructure management
 
-## 📋 Deliverables
+## Deliverables
 
-- Fully functional AWS infrastructure
-- Configured and running Nginx web servers
-- Secure SSH access configured
-- Documentation of endpoints and credentials
-- Versioned and documented Terraform code
+- AWS infrastructure defined in Terraform
+- Nginx bootstrap on both EC2 instances
+- SSH access configured through input public key values
+- Versioned Terraform code with outputs for inspection
 
-## 🛠️ Technologies Used
+## Technologies Used
 
-- **Terraform** >= 1.0
-- **AWS CLI** >= 2.0
-- **AWS Provider** Terraform
+- **Terraform**
+- **AWS CLI**
+- **AWS Provider** for Terraform
 
-## 📋 Prerequisites
+## Prerequisites
 
 ### Required Software
 
-1. **Terraform** (version 1.0 or higher)
+1. **Terraform**
 
    ```bash
-   # Verify installation
    terraform version
    ```
 
 2. **AWS CLI** configured
 
    ```bash
-   # Install AWS CLI
-   curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-   unzip awscliv2.zip
-   sudo ./aws/install
-
-   # Verify installation
    aws --version
    ```
 
 3. **Git** to clone the repository
+
    ```bash
    git --version
    ```
@@ -115,38 +105,36 @@ This project provides a complete AWS infrastructure using Terraform as an Infras
 1. **AWS Credentials**
 
    ```bash
-   # Configure credentials
    aws configure
    ```
 
-   Or set environment variables:
+   Or use a named profile:
 
    ```bash
-   export AWS_ACCESS_KEY_ID="your-access-key"
-   export AWS_SECRET_ACCESS_KEY="your-secret-key"
+   aws configure --profile terraform-lab
+   export AWS_PROFILE="terraform-lab"
    export AWS_DEFAULT_REGION="us-east-1"
    ```
 
-2. **Required IAM Permissions**
+2. **AWS Access Scope**
 
-   - EC2FullAccess
-   - VPCFullAccess
-   - IAMFullAccess
-   - S3FullAccess (for remote backend)
-   - CloudFormationFullAccess
+   Use AWS credentials that can manage the EC2, key pair, security group, and S3 backend resources referenced by this configuration.
 
-3. **Requires an S3 Bucket created for later use in the backend**
-   ```bash
-   terraform {
-   backend "s3" {
-    bucket  = "infrastructure-automatization-with-terraform" # S3 bucket name
-    key     = "infrastructure-automatization-with-terraform/terraform.tfstate" # file path and name
-    region  = "us-east-1"
-    #encrypt = true # Enable SSE-S3 encryption
-   }
-   ```
+3. **Pre-existing S3 Backend Bucket**
 
-## 🚀 Installation and Usage
+    ```hcl
+    terraform {
+      backend "s3" {
+        bucket       = "infrastructure-automatization-with-terraform"
+        key          = "infrastructure-automatization/terraform.tfstate"
+        region       = "us-east-1"
+        encrypt      = true
+        use_lockfile = true
+      }
+    }
+    ```
+
+## Installation and Usage
 
 ### 1. Clone the Repository
 
@@ -155,213 +143,162 @@ git clone https://github.com/horus0523/Infrastructure-Automation-with-Terraform-
 cd Infrastructure-Automation-with-Terraform-and-AWS
 ```
 
-### 2. Create the necessary SSH keys to configure the nginx-server
+### 2. Prepare input values
 
-**Create SSH key to nginx-server-dev**
+Before planning or applying, provide the input values required by the current
+root module using your normal Terraform workflow. The repository includes
+`terraform.tfvars.example` as a template with safe placeholder values.
 
-```bash
-ssh-keygen -t ed25519 -C "dev@nginx-server" -f ssh-keys/nginx-server-dev.key -N ""
-```
-
-**Create SSH key to nginx-server-qa**
-
-```bash
-ssh-keygen -t ed25519 -C "qa@nginx-server" -f ssh-keys/nginx-server-qa.key -N ""
-```
+Copy that file to a local ignored file such as `local.tfvars` or
+`<your-local-file>.tfvars`, replace the placeholders with your real values, and
+keep that local file outside version control.
 
 ### 3. Initialize Terraform
 
 ```bash
-# Initialize working directory
 terraform init
 ```
 
 ### 4. Validate Configuration
 
 ```bash
-# Validate syntax
 terraform validate
-
-# Format code
 terraform fmt
 ```
 
 ### 5. Plan Deployment
 
 ```bash
-# View execution plan
-terraform plan
+cp terraform.tfvars.example local.tfvars
+# Edit local.tfvars with real values before planning.
+terraform plan -var-file=local.tfvars
 ```
 
-**Or use**
+Terraform automatically loads `terraform.tfvars` and `*.auto.tfvars` files from the working directory. Other `.tfvars` files require `-var-file`. Remember that `-var-file` only changes input values for the same root module. It does not select a single environment module.
 
 ```bash
-# You can generate an execution plan and save it in a binary file called server_qa.tfplan
-terraform plan -out=server_qa.tfplan
+terraform plan -var-file=<your-local-file>.tfvars
 ```
+
+On an empty state, the current root module still plans both `nginx_server_dev` and `nginx_server_qa`, so the expected summary is **6 resources to add**.
 
 ### 6. Apply Changes
 
 ```bash
-# Apply configuration
-terraform apply
+terraform apply -var-file=local.tfvars
 
-# Apply automatically (without confirmation)
-terraform apply -auto-approve
-```
-
-**Or use**
-
-```bash
-# Applies the previously saved plan
-terraform apply server_qa.tfplan
+# or use your own ignored filename
+terraform apply -var-file=<your-local-file>.tfvars
 ```
 
 ### 7. Verify Resources
 
 ```bash
-# View outputs
 terraform output
-
-# View current state
 terraform show
 ```
 
+To validate the deployed Nginx instances after a real apply:
+
+```bash
+curl http://<nginx_dev_ip>
+curl http://<nginx_qa_ip>
+```
+
+Treat the HTTP 200 response as expected runtime evidence, not as evidence already captured in this repository.
+
 ### 8. Connect to EC2 Instances
 
-**Connect to nginx-server-dev**
+**Connect to `nginx-server-dev`**
 
 ```bash
-ssh -i ./ssh-keys/nginx-server-dev.key ec2-user@publicIP # Replace `publicIP` with your actual public IP. This is shown in the output
+ssh -i /path/to/private-key ec2-user@publicIP
 ```
 
-**Connect to nginx-server-qa**
+**Connect to `nginx-server-qa`**
 
 ```bash
-ssh -i ./ssh-keys/nginx-server-qa.key ec2-user@publicIP # Replace `publicIP` with your actual public IP. This is shown in the output
+ssh -i /path/to/private-key ec2-user@publicIP
 ```
 
-## 📁 Project Structure
+## Project Structure
 
-```
+```text
 infrastructure-automation-with-terraform-and-aws/
 ├── main.tf                   # Main configuration
 ├── nginx_server_module/      # Reusable modules
-│   ├── 00.variables.tf/      # Variable definitions
-│   ├── 01.provider.tf/       # Provider definition
-│   └── 02.ec2.tf/            # EC2 instance definition
-│   └── 03.key.tf/            # Key definition
-│   └── 04.sg.tf/             # Security groups definition
-│   └── 05.outputs.tf/        # Output definitions
+│   ├── 00.variables.tf       # Variable definitions
+│   ├── 01.provider.tf        # Provider definition
+│   ├── 02.ec2.tf             # EC2 instance definition
+│   ├── 03.key.tf             # Key pair definition
+│   ├── 04.sg.tf              # Security group definition
+│   └── 05.outputs.tf         # Output definitions
 └── README.md                 # README file
 ```
 
-## ⚙️ Configuration Variables
+## Configuration Variables
 
 ### Main Variables
 
-| Variable        | Description            | Type     | Default Value           | Required |
-| --------------- | ---------------------- | -------- | ----------------------- | -------- |
-| `environment`   | Deployment environment | `string` | `test`                  | ❌       |
-| `instance_type` | EC2 instance type      | `string` | `t3.micro`              | ❌       |
-| `server_name`   | Server name            | `string` | `nginx-server`          | ❌       |
-| `ami_id`        | AMI ID                 | `string` | `ami-0440d3b780d96b29d` | ❌       |
+| Variable | Description | Default Value |
+| -------- | ----------- | ------------- |
+| `aws_region` | AWS region for the root module | `us-east-1` |
+| `allowed_ssh_cidr` | Trusted IPv4 CIDR allowed to reach SSH on both instances | `127.0.0.1/32` |
+| `nginx_dev_public_key` | SSH public key contents for the dev key pair | Required |
+| `nginx_qa_public_key` | SSH public key contents for the qa key pair | Required |
+| `common_tags` | Optional extra tags merged into all resources | `{}` |
 
-## 🔧 Useful Commands
+## Useful Commands
 
 ### State Management
 
 ```bash
-# List resources in state
 terraform state list
-
-# Show specific resource
 terraform state show aws_instance.example
-
-# Import existing resource
-terraform import aws_instance.example i-123450abcde0
-```
-
-**To import the resource you must uncomment the code block in the `main.tf` file**
-
-```bash
-####### import #######
-# Import resources to terraform `ec2 instance`
-resource "aws_instance" "server-web" {
-(resource arguments)
-}
-```
-
-**Execute the import command**
-
-```bash
 terraform import aws_instance.example i-123450abcde0
 ```
 
 ### Workspace Management
 
 ```bash
-# Create workspace
 terraform workspace new production
-
-# Switch workspace
 terraform workspace select development
-
-# List workspaces
 terraform workspace list
 ```
 
 ### Destroy Infrastructure
 
 ```bash
-# Destroy all resources
-terraform destroy
+terraform destroy -var-file="local.tfvars"
 ```
 
-**Or use**
+## Security
 
-```bash
-# Destroy specific resource
-terraform destroy -target=aws_instance.example
-```
+### Current Tracked Posture
 
-## 🔒 Security
+- Uses a remote S3 backend for shared state
+- Uses explicit security group ingress rules for SSH and HTTP
+- Uses tags for traceability
+- Does not currently attach IAM roles to the EC2 instances
+- SSH ingress depends on the input values supplied at plan/apply time
 
-### Implemented Best Practices
-
-- ✅ Use of variables for sensitive data
-- ✅ Remote backend for shared state
-- ✅ State encryption in S3 (enable encryption)
-- ✅ Security groups with minimal rules
-- ✅ IAM roles with limited permissions
-- ✅ Tags for traceability
-
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Errors
 
 1. **AWS Credentials Error**
 
    ```bash
-   # Verify configuration
    aws sts get-caller-identity
    ```
 
 2. **Locked State**
 
    ```bash
-   # Force unlock (use with caution)
    terraform force-unlock LOCK_ID
    ```
 
-3. **Permission Error**
-
-   ```bash
-   # Verify required IAM permissions
-   aws iam list-attached-user-policies --user-name your-username
-   ```
-
-## 📚 Additional Resources
+## Additional Resources
 
 - [Official Terraform Documentation](https://www.terraform.io/docs)
 - [AWS Provider Guide](https://registry.terraform.io/providers/hashicorp/aws/latest/docs)
