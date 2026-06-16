@@ -60,8 +60,3 @@ jobs:
 
       - name: Run Checkov
         run: checkov -d . --compact
-
-      - name: Terraform Plan for PR
-        if: github.event_name == 'pull_request' && env.AWS_ACCESS_KEY_ID != '' && env.AWS_SECRET_ACCESS_KEY != ''
-        run: terraform plan -no-color
-        id: plan
